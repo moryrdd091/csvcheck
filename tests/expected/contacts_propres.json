@@ -1,0 +1,23 @@
+{
+  "fixture": "contacts_propres.csv",
+  "profile": "contacts-v1",
+  "status": "clean",
+  "exit_code": 0,
+  "records_total": 5,
+  "physical_lines_total": 7,
+  "records_evaluated": 5,
+  "records_affected": 0,
+  "anomaly_count": 0,
+  "anomalies": [],
+  "assertions": {
+    "record_3_line_start": 4,
+    "record_3_line_end": 5,
+    "record_3_notes": "Première ligne\nDeuxième ligne",
+    "record_1_id": "0001",
+    "record_1_telephone": "0400000001",
+    "record_1_code_postal": "0900",
+    "source_sha256_unchanged": true,
+    "html_report_created": true,
+    "anomaly_csv_header_only": true
+  }
+}

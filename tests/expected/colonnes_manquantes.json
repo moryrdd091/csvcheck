@@ -1,0 +1,29 @@
+{
+  "fixture": "colonnes_manquantes.csv",
+  "profile": "contacts-v1",
+  "status": "schema_anomalies",
+  "exit_code": 1,
+  "records_total": 2,
+  "physical_lines_total": 3,
+  "records_evaluated": 0,
+  "records_affected": null,
+  "anomaly_count": 1,
+  "missing_columns": ["email"],
+  "data_checks": "not_evaluated",
+  "anomalies": [
+    {
+      "record_number": null,
+      "line_start": null,
+      "line_end": null,
+      "column_index": null,
+      "rule": "MISSING_COLUMN"
+    }
+  ],
+  "assertions": {
+    "structure_checked_to_end": true,
+    "html_report_created": true,
+    "html_explains_data_not_evaluated": true,
+    "anomaly_csv_header_only": false,
+    "source_sha256_unchanged": true
+  }
+}

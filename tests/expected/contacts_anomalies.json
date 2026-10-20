@@ -1,0 +1,52 @@
+{
+  "fixture": "contacts_anomalies.csv",
+  "profile": "contacts-v1",
+  "status": "data_anomalies",
+  "exit_code": 1,
+  "records_total": 5,
+  "physical_lines_total": 7,
+  "records_evaluated": 5,
+  "records_affected": 4,
+  "anomaly_count": 4,
+  "anomalies": [
+    {
+      "record_number": 1,
+      "line_start": 2,
+      "line_end": 2,
+      "column_index": 3,
+      "rule": "DUPLICATE_EMAIL"
+    },
+    {
+      "record_number": 2,
+      "line_start": 3,
+      "line_end": 3,
+      "column_index": 2,
+      "rule": "REQUIRED_VALUE"
+    },
+    {
+      "record_number": 4,
+      "line_start": 6,
+      "line_end": 6,
+      "column_index": 3,
+      "rule": "EMAIL_FORMAT"
+    },
+    {
+      "record_number": 5,
+      "line_start": 7,
+      "line_end": 7,
+      "column_index": 3,
+      "rule": "DUPLICATE_EMAIL"
+    }
+  ],
+  "assertions": {
+    "record_3_line_start": 4,
+    "record_3_line_end": 5,
+    "record_3_notes": "Première ligne\nDeuxième ligne",
+    "record_1_id": "0001",
+    "record_1_telephone": "0400000001",
+    "record_1_code_postal": "0900",
+    "source_sha256_unchanged": true,
+    "html_report_created": true,
+    "anomaly_csv_header_only": false
+  }
+}

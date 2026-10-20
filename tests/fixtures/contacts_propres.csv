@@ -1,0 +1,7 @@
+id;nom;email;telephone;code_postal;notes
+0001;Personne Alpha;alpha@example.com;0400000001;0900;Contact fictif
+0002;Personne Bravo;bravo@example.com;0400000002;0900;Contact fictif
+0003;Personne Charlie;charlie@example.com;0400000003;0900;"Première ligne
+Deuxième ligne"
+0004;Personne Delta;delta@example.com;0400000004;0900;Contact fictif
+0005;Personne Echo;echo@example.com;0400000005;0900;Contact fictif

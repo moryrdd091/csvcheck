@@ -1,0 +1,19 @@
+{
+  "fixture": "csv_malforme.csv",
+  "profile": "contacts-v1",
+  "status": "error",
+  "exit_code": 2,
+  "error_code": "CSV_PARSE_ERROR",
+  "error_record_number": 2,
+  "error_line_start": 3,
+  "records_total": null,
+  "records_evaluated": null,
+  "records_affected": null,
+  "anomaly_count": null,
+  "assertions": {
+    "stderr_explains_unclosed_quote_or_unexpected_eof": true,
+    "new_final_report_directory_created": false,
+    "no_partial_analysis_presented_as_complete": true,
+    "source_sha256_unchanged": true
+  }
+}
