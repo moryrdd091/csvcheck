@@ -23,8 +23,15 @@ Il contrôle la taille du fichier à l’ouverture ainsi que
 la longueur des champs décodés. Le contrôle à l’ouverture
 ne protège pas contre un fichier qui grossit pendant la lecture.
 
-Les contrôles métier, la commande CLI et la génération
-des rapports ne sont pas encore implémentés.
+Le profil contacts-v1 vérifie les colonnes et valeurs obligatoires,
+le format simplifié des e-mails et leurs doublons.
+
+La validation produit des anomalies ordonnées et des compteurs.
+Lorsque des colonnes obligatoires sont absentes, les valeurs
+sont indiquées comme non évaluées.
+
+La commande CLI et la génération des rapports ne sont pas
+encore implémentées.
 
 Aucune commande d’analyse destinée à l’utilisateur n’est
 disponible à ce stade.
@@ -61,11 +68,13 @@ et leurs résultats attendus au format JSON.
 | Colonne obligatoire absente | Anomalie de schéma, valeurs non évaluées, code 1 |
 | CSV malformé | Erreur bloquante, code 2 |
 
-Les jeux de référence sont utilisés par les premiers tests
-automatisés du lecteur.
+Les jeux de référence sont utilisés par les tests automatisés
+du lecteur et de la validation métier.
 
-Les résultats attendus concernant les contrôles métier,
-les codes de retour et les rapports ne sont pas encore
+Les anomalies, les statuts de validation et les compteurs
+sont comparés aux résultats attendus.
+
+Les codes de retour et les rapports ne sont pas encore
 vérifiés par cette suite.
 
 ## Limites du périmètre

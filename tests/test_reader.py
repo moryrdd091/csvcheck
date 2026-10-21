@@ -269,3 +269,28 @@ def test_field_size_limit(tmp_path, field_size, should_fail):
 def test_default_size_limits():
     assert reader_module.MAX_FILE_SIZE_BYTES == 52_428_800  # 50 Mio
     assert reader_module.MAX_FIELD_SIZE_CHARACTERS == 100_000  # 100,000 characters
+
+
+@pytest.mark.parametrize(
+    ("field_size", "should_fail"),
+    [
+        pytest.param(100_000, False, id="exact-header-field-size-limit"),
+        pytest.param(100_001, True, id="above-header-field-size-limit"),
+    ],
+)
+def test_header_field_size_limit(tmp_path, field_size, should_fail):
+    source = tmp_path / "header_field_size.csv"
+    column_name = "é" * field_size
+    original_bytes = f"{column_name}\n".encode("utf-8")
+    source.write_bytes(original_bytes)
+
+    if should_fail:
+        with pytest.raises(ValueError, match="champ"):
+            read_csv(source)
+    else:
+        result = read_csv(source)
+        assert result.header == (column_name,)
+        assert result.records == ()
+        assert result.physical_lines_total == 1
+
+    assert source.read_bytes() == original_bytes
