@@ -1,0 +1,1 @@
+"""Contrôle local de fichiers CSV de contacts."""

@@ -13,12 +13,18 @@ reproductibles et la préservation des valeurs d’origine.
 
 ## État du projet
 
-Le comportement attendu et les jeux de référence sont définis.
-Le moteur d’analyse et l’interface en ligne de commande
-ne sont pas encore implémentés.
+Un premier lecteur CSV est implémenté et couvert par quatre
+cas de test automatisés.
 
-Aucune commande d’installation ou d’utilisation n’est disponible
-à ce stade.
+Il lit les fichiers structurellement valides, conserve les valeurs
+et leurs références de lignes, et rejette le CSV malformé
+du jeu de référence.
+
+Les contrôles métier, les limites de taille, la commande CLI
+et la génération des rapports ne sont pas encore implémentés.
+
+Aucune commande d’analyse destinée à l’utilisateur n’est
+disponible à ce stade.
 
 ## Périmètre de la version 0.1
 
@@ -52,8 +58,12 @@ et leurs résultats attendus au format JSON.
 | Colonne obligatoire absente | Anomalie de schéma, valeurs non évaluées, code 1 |
 | CSV malformé | Erreur bloquante, code 2 |
 
-Ces fichiers serviront de base aux tests automatisés.
-Ils ne constituent pas encore une suite de tests exécutable.
+Les jeux de référence sont utilisés par les premiers tests
+automatisés du lecteur.
+
+Les résultats attendus concernant les contrôles métier,
+les codes de retour et les rapports ne sont pas encore
+vérifiés par cette suite.
 
 ## Limites du périmètre
 
