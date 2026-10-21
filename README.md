@@ -13,15 +13,18 @@ reproductibles et la préservation des valeurs d’origine.
 
 ## État du projet
 
-Un premier lecteur CSV est implémenté et couvert par quatre
-cas de test automatisés.
+Un lecteur CSV est implémenté et couvert par des tests automatisés.
 
-Il lit les fichiers structurellement valides, conserve les valeurs
-et leurs références de lignes, et rejette le CSV malformé
-du jeu de référence.
+Il vérifie la structure des fichiers, conserve les valeurs
+et leurs références de lignes, et rejette les entrées invalides
+couvertes par les tests.
 
-Les contrôles métier, les limites de taille, la commande CLI
-et la génération des rapports ne sont pas encore implémentés.
+Il contrôle la taille du fichier à l’ouverture ainsi que
+la longueur des champs décodés. Le contrôle à l’ouverture
+ne protège pas contre un fichier qui grossit pendant la lecture.
+
+Les contrôles métier, la commande CLI et la génération
+des rapports ne sont pas encore implémentés.
 
 Aucune commande d’analyse destinée à l’utilisateur n’est
 disponible à ce stade.

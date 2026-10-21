@@ -1,7 +1,10 @@
+import os
 import csv
 from dataclasses import dataclass
 from pathlib import Path
 
+MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50 Mio
+MAX_FIELD_SIZE_CHARACTERS = 100_000  # 100,000 characters
 
 @dataclass(frozen=True)
 class CsvRecord:
@@ -18,6 +21,11 @@ class CsvReadResult:
     physical_lines_total: int
 
 
+def _check_field_sizes(fields: list[str]) -> None:
+    if any(len(value) > MAX_FIELD_SIZE_CHARACTERS for value in fields):
+        raise ValueError("Un champ dépasse la taille maximale autorisée.")
+
+
 def read_csv(
     path: Path,
     *,
@@ -29,11 +37,18 @@ def read_csv(
     records: list[CsvRecord] = []
 
     with path.open(encoding="utf-8-sig", newline="") as source:
+        file_size = os.fstat(source.fileno()).st_size
+
+        if file_size > MAX_FILE_SIZE_BYTES:
+            raise ValueError("Le fichier dépasse la taille maximale autorisée.")
+
         reader = csv.reader(source, delimiter=delimiter, strict=True)
+
         header = next(reader, None)
 
         if not header:
             raise ValueError("Le fichier ne contient pas d’en-tête exploitable.")
+        _check_field_sizes(header)
 
         if any(not name.strip() for name in header):
             raise ValueError("Un nom de colonne est vide.")
@@ -53,6 +68,7 @@ def read_csv(
                 raise ValueError(
                     f"Nombre de champs incorrect à la ligne {line_start}."
                 )
+            _check_field_sizes(row)
 
             records.append(
                 CsvRecord(
