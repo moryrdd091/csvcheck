@@ -21,6 +21,21 @@ class CsvReadResult:
     physical_lines_total: int
 
 
+class CsvParseError(csv.Error):
+    """Erreur de syntaxe CSV avec les références de l'enregistrement concerné."""
+
+    def __init__(
+        self,
+        message: str,
+        *,
+        record_number: int | None = None,
+        line_start: int | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.record_number = record_number
+        self.line_start = line_start
+
+
 def _check_field_sizes(fields: list[str]) -> None:
     if any(len(value) > MAX_FIELD_SIZE_CHARACTERS for value in fields):
         raise ValueError("Un champ dépasse la taille maximale autorisée.")
@@ -63,6 +78,12 @@ def read_csv(
                 row = next(reader)
             except StopIteration:
                 break
+            except csv.Error as error:
+                raise CsvParseError(
+                    str(error),
+                    record_number=len(records) + 1,
+                    line_start=line_start,
+                ) from error
 
             if len(row) != len(header):
                 raise ValueError(

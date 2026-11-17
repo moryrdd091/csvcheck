@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from csvcheck.reader import read_csv
+from csvcheck.reader import CsvParseError, read_csv
 from csvcheck import reader as reader_module
 
 
@@ -59,6 +59,19 @@ def test_reject_malformed_csv_without_altering_source():
 
     source_hash_after = hashlib.sha256(source.read_bytes()).hexdigest()
     assert source_hash_after == source_hash_before
+
+
+def test_malformed_csv_error_has_record_and_line_references():
+    source = TESTS_DIR / "fixtures" / "csv_malforme.csv"
+    expected_path = TESTS_DIR / "expected" / "csv_malforme.json"
+    expected = json.loads(expected_path.read_text(encoding="utf-8"))
+
+    with pytest.raises(CsvParseError) as error:
+        read_csv(source)
+
+    assert isinstance(error.value, csv.Error)
+    assert error.value.record_number == expected["error_record_number"]
+    assert error.value.line_start == expected["error_line_start"]
 
 
 @pytest.mark.parametrize(
