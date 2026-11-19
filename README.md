@@ -30,6 +30,12 @@ La validation produit des anomalies ordonnées et des compteurs.
 Lorsque des colonnes obligatoires sont absentes, les valeurs
 sont indiquées comme non évaluées.
 
+Une couche applicative orchestre la lecture et la validation.
+Elle distingue une analyse terminée, avec ou sans anomalies,
+d’une analyse impossible. Seule l’erreur de syntaxe CSV est
+convertie en résultat typé ; les autres erreurs du lecteur
+restent des exceptions techniques.
+
 La commande CLI et la génération des rapports ne sont pas
 encore implémentées.
 
@@ -69,7 +75,7 @@ et leurs résultats attendus au format JSON.
 | CSV malformé | Erreur bloquante, code 2 |
 
 Les jeux de référence sont utilisés par les tests automatisés
-du lecteur et de la validation métier.
+du lecteur, de la validation métier et de la couche applicative.
 
 Les anomalies, les statuts de validation et les compteurs
 sont comparés aux résultats attendus.
