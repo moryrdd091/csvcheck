@@ -36,11 +36,27 @@ d’une analyse impossible. Seule l’erreur de syntaxe CSV est
 convertie en résultat typé ; les autres erreurs du lecteur
 restent des exceptions techniques.
 
-La commande CLI et la génération des rapports ne sont pas
-encore implémentées.
+Une commande en ligne de commande est disponible après
+installation éditable. Elle affiche un bilan sur la sortie
+standard et retourne le code 0, 1 ou 2. Les erreurs bloquantes
+sont affichées sur la sortie d’erreur, sans valeur de cellule.
 
-Aucune commande d’analyse destinée à l’utilisateur n’est
-disponible à ce stade.
+Seules l’absence de fichier et l’erreur de syntaxe CSV produisent
+un diagnostic maîtrisé ; les autres erreurs du lecteur produisent
+encore une trace technique.
+
+La génération des rapports HTML et CSV n’est pas encore
+implémentée.
+
+## Utilisation
+
+```bash
+python -m pip install -e .
+csvcheck contacts.csv
+```
+
+Codes de retour : 0 sans anomalie, 1 avec anomalies
+de données ou de schéma, 2 analyse impossible.
 
 ## Périmètre de la version 0.1
 
@@ -80,8 +96,9 @@ du lecteur, de la validation métier et de la couche applicative.
 Les anomalies, les statuts de validation et les compteurs
 sont comparés aux résultats attendus.
 
-Les codes de retour et les rapports ne sont pas encore
-vérifiés par cette suite.
+Les codes de retour sont vérifiés pour les quatre jeux
+de référence. Les rapports ne sont pas encore vérifiés
+par cette suite.
 
 ## Limites du périmètre
 
