@@ -51,10 +51,15 @@ implémentée.
 ```bash
 python -m pip install -e .
 csvcheck contacts.csv
+csvcheck --separator , contacts_virgules.csv
 ```
 
 Codes de retour : 0 sans anomalie, 1 avec anomalies
 de données ou de schéma, 2 analyse impossible.
+
+Le séparateur est le point-virgule par défaut ; la virgule
+est disponible sur choix explicite. Aucune détection
+automatique n’est effectuée.
 
 ## Périmètre de la version 0.1
 

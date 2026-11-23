@@ -74,7 +74,7 @@ def test_analyze_contacts_fails_on_unreadable_file(tmp_path, monkeypatch):
     source = tmp_path / "illisible.csv"
     source.write_text("id;nom;email\n", encoding="utf-8")
 
-    def raise_permission_error(_path):
+    def raise_permission_error(_path, **_kwargs):
         raise PermissionError("accès refusé")
 
     monkeypatch.setattr(application_module, "read_csv", raise_permission_error)
@@ -180,3 +180,31 @@ def test_analyze_contacts_fails_on_malformed_header(tmp_path):
     assert outcome.error.code == "CSV_PARSE_ERROR"
     assert outcome.error.record_number is None
     assert outcome.error.line_start == 1
+
+
+def test_analyze_contacts_accepts_comma_delimiter(tmp_path):
+    source = tmp_path / "contacts_virgule.csv"
+    source.write_text(
+        "id,nom,email\n0001,Personne Alpha,alpha@example.com\n",
+        encoding="utf-8",
+    )
+
+    outcome = analyze_contacts(source, delimiter=",")
+
+    assert isinstance(outcome, AnalysisCompleted)
+    assert outcome.validation.status == "clean"
+    assert outcome.validation.records_total == 1
+
+
+def test_analyze_contacts_does_not_retry_with_other_delimiter(tmp_path):
+    source = tmp_path / "contacts_virgule.csv"
+    source.write_text(
+        "id,nom,email\n0001,Personne Alpha,alpha@example.com\n",
+        encoding="utf-8",
+    )
+
+    outcome = analyze_contacts(source)
+
+    assert isinstance(outcome, AnalysisCompleted)
+    assert outcome.validation.status == "schema_anomalies"
+    assert outcome.validation.missing_columns == ("id", "nom", "email")

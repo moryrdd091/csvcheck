@@ -30,10 +30,18 @@ def main(argv: list[str] | None = None) -> int:
         description="Contrôler un fichier CSV de contacts avant import.",
     )
     parser.add_argument("fichier", help="Chemin du fichier CSV à analyser")
+    parser.add_argument(
+        "--separator",
+        choices=[";", ","],
+        default=";",
+        help="Séparateur de champs du fichier CSV",
+    )
     args = parser.parse_args(argv)
 
     path = Path(args.fichier)
-    outcome = analyze_contacts(path)
+    outcome = analyze_contacts(
+        Path(args.fichier), delimiter=args.separator
+    )
 
     if isinstance(outcome, AnalysisFailed):
         error = outcome.error

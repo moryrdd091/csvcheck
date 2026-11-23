@@ -40,10 +40,14 @@ def _failed(
     )
 
 
-def analyze_contacts(path: Path) -> AnalysisCompleted | AnalysisFailed:
+def analyze_contacts(
+    path: Path,
+    *,
+    delimiter: str = ";",
+) -> AnalysisCompleted | AnalysisFailed:
     """Orchestrer la lecture et la validation d'un fichier de contacts."""
     try:
-        csv_data = read_csv(path)
+        csv_data = read_csv(path, delimiter=delimiter)
     except FileNotFoundError:
         return _failed("FILE_NOT_FOUND", f"Fichier introuvable : {path}")
     except OSError:

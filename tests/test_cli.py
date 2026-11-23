@@ -78,3 +78,27 @@ def test_cli_module_end_to_end_for_malformed_csv():
     assert completed.returncode == 2
     assert "CSV_PARSE_ERROR" in completed.stderr
     assert "Traceback" not in completed.stderr
+
+
+def test_cli_accepts_comma_separator(tmp_path, capsys):
+    source = tmp_path / "contacts_virgule.csv"
+    source.write_text(
+        "id,nom,email\n0001,Personne Alpha,alpha@example.com\n",
+        encoding="utf-8",
+    )
+
+    exit_code = main(["--separator", ",", str(source)])
+    captured = capsys.readouterr()
+
+    assert exit_code == 0
+    assert "clean" in captured.out
+
+
+def test_cli_rejects_unknown_separator(tmp_path):
+    source = tmp_path / "contacts.csv"
+    source.write_text("id;nom;email\n", encoding="utf-8")
+
+    with pytest.raises(SystemExit) as exit_info:
+        main(["--separator", "|", str(source)])
+
+    assert exit_info.value.code == 2
