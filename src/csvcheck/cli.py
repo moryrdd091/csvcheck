@@ -33,12 +33,7 @@ def main(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     path = Path(args.fichier)
-
-    try:
-        outcome = analyze_contacts(path)
-    except FileNotFoundError:
-        print(f"Fichier introuvable : {path}", file=sys.stderr)
-        return 2
+    outcome = analyze_contacts(path)
 
     if isinstance(outcome, AnalysisFailed):
         error = outcome.error
@@ -47,7 +42,10 @@ def main(argv: list[str] | None = None) -> int:
             location = (
                 f" (enregistrement {error.record_number}, ligne {error.line_start})"
             )
-        print(f"Analyse impossible : {error.code}{location}", file=sys.stderr)
+        print(
+            f"Analyse impossible : {error.code}{location} — {error.message}",
+            file=sys.stderr,
+        )
         return 2
 
     assert isinstance(outcome, AnalysisCompleted)

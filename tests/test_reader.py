@@ -5,7 +5,7 @@ from pathlib import Path
 
 import pytest
 
-from csvcheck.reader import CsvParseError, read_csv
+from csvcheck.reader import CsvParseError, CsvReadError, read_csv
 from csvcheck import reader as reader_module
 
 
@@ -217,9 +217,10 @@ def test_reject_invalid_utf8_without_altering_source(
     source = tmp_path / "invalid_utf8.csv"
     source.write_bytes(invalid_bytes)
 
-    with pytest.raises(UnicodeDecodeError):
+    with pytest.raises(CsvReadError) as error:
         read_csv(source)
 
+    assert error.value.code == "INVALID_UTF8"
     assert source.read_bytes() == invalid_bytes
 
 

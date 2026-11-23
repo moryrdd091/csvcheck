@@ -1,10 +1,11 @@
-import os
 import csv
+import os
 from dataclasses import dataclass
 from pathlib import Path
 
-MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50 Mio
-MAX_FIELD_SIZE_CHARACTERS = 100_000  # 100,000 characters
+MAX_FILE_SIZE_BYTES = 50 * 1024 * 1024  # 50 MiB
+MAX_FIELD_SIZE_CHARACTERS = 100_000  # 100 000 caractères
+
 
 @dataclass(frozen=True)
 class CsvRecord:
@@ -21,8 +22,25 @@ class CsvReadResult:
     physical_lines_total: int
 
 
-class CsvParseError(csv.Error):
-    """Erreur de syntaxe CSV avec les références de l'enregistrement concerné."""
+class CsvReadError(ValueError):
+    """Erreur bloquante de lecture, identifiée par un code stable."""
+
+    def __init__(
+        self,
+        code: str,
+        message: str,
+        *,
+        record_number: int | None = None,
+        line_start: int | None = None,
+    ) -> None:
+        super().__init__(message)
+        self.code = code
+        self.record_number = record_number
+        self.line_start = line_start
+
+
+class CsvParseError(CsvReadError, csv.Error):
+    """Erreur de syntaxe CSV détectée par le module csv."""
 
     def __init__(
         self,
@@ -31,14 +49,27 @@ class CsvParseError(csv.Error):
         record_number: int | None = None,
         line_start: int | None = None,
     ) -> None:
-        super().__init__(message)
-        self.record_number = record_number
-        self.line_start = line_start
+        super().__init__(
+            "CSV_PARSE_ERROR",
+            message,
+            record_number=record_number,
+            line_start=line_start,
+        )
 
 
-def _check_field_sizes(fields: list[str]) -> None:
+def _check_field_sizes(
+    fields: list[str],
+    *,
+    record_number: int | None = None,
+    line_start: int | None = None,
+) -> None:
     if any(len(value) > MAX_FIELD_SIZE_CHARACTERS for value in fields):
-        raise ValueError("Un champ dépasse la taille maximale autorisée.")
+        raise CsvReadError(
+            "FIELD_SIZE_LIMIT_EXCEEDED",
+            "Un champ dépasse la taille maximale autorisée.",
+            record_number=record_number,
+            line_start=line_start,
+        )
 
 
 def read_csv(
@@ -55,21 +86,46 @@ def read_csv(
         file_size = os.fstat(source.fileno()).st_size
 
         if file_size > MAX_FILE_SIZE_BYTES:
-            raise ValueError("Le fichier dépasse la taille maximale autorisée.")
+            raise CsvReadError(
+                "FILE_SIZE_LIMIT_EXCEEDED",
+                "Le fichier dépasse la taille maximale autorisée.",
+            )
 
         reader = csv.reader(source, delimiter=delimiter, strict=True)
 
-        header = next(reader, None)
+        try:
+            header = next(reader, None)
+        except UnicodeDecodeError as error:
+            raise CsvReadError(
+                "INVALID_UTF8",
+                "Le fichier n’est pas encodé en UTF-8 valide.",
+            ) from error
+        except csv.Error as error:
+            raise CsvParseError(
+                str(error),
+                line_start=1,
+            ) from error
 
         if not header:
-            raise ValueError("Le fichier ne contient pas d’en-tête exploitable.")
-        _check_field_sizes(header)
+            raise CsvReadError(
+                "NO_HEADER",
+                "Le fichier ne contient pas d’en-tête exploitable.",
+            )
+        _check_field_sizes(header, line_start=1)
 
         if any(not name.strip() for name in header):
-            raise ValueError("Un nom de colonne est vide.")
+            raise CsvReadError(
+                "INVALID_HEADER",
+                "Un nom de colonne est vide.",
+                line_start=1,
+            )
 
         if len(header) != len(set(header)):
-            raise ValueError("L’en-tête contient des noms de colonnes dupliqués.")
+            raise CsvReadError(
+                "INVALID_HEADER",
+                "L’en-tête contient des noms de colonnes dupliqués.",
+                line_start=1,
+            )
 
         while True:
             line_start = reader.line_num + 1
@@ -84,12 +140,24 @@ def read_csv(
                     record_number=len(records) + 1,
                     line_start=line_start,
                 ) from error
+            except UnicodeDecodeError as error:
+                raise CsvReadError(
+                    "INVALID_UTF8",
+                    "Le fichier n’est pas encodé en UTF-8 valide.",
+                ) from error
 
             if len(row) != len(header):
-                raise ValueError(
-                    f"Nombre de champs incorrect à la ligne {line_start}."
+                raise CsvReadError(
+                    "FIELD_COUNT_MISMATCH",
+                    f"Nombre de champs incorrect à la ligne {line_start}.",
+                    record_number=len(records) + 1,
+                    line_start=line_start,
                 )
-            _check_field_sizes(row)
+            _check_field_sizes(
+                row,
+                record_number=len(records) + 1,
+                line_start=line_start,
+            )
 
             records.append(
                 CsvRecord(

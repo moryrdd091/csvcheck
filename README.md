@@ -32,18 +32,16 @@ sont indiquées comme non évaluées.
 
 Une couche applicative orchestre la lecture et la validation.
 Elle distingue une analyse terminée, avec ou sans anomalies,
-d’une analyse impossible. Seule l’erreur de syntaxe CSV est
-convertie en résultat typé ; les autres erreurs du lecteur
-restent des exceptions techniques.
+d’une analyse impossible. Toutes les erreurs bloquantes du lecteur
+sont converties en résultats typés : syntaxe CSV, encodage,
+en-tête invalide, structure, limites de taille, fichier
+introuvable ou illisible.
 
 Une commande en ligne de commande est disponible après
 installation éditable. Elle affiche un bilan sur la sortie
 standard et retourne le code 0, 1 ou 2. Les erreurs bloquantes
-sont affichées sur la sortie d’erreur, sans valeur de cellule.
-
-Seules l’absence de fichier et l’erreur de syntaxe CSV produisent
-un diagnostic maîtrisé ; les autres erreurs du lecteur produisent
-encore une trace technique.
+sont affichées sur la sortie d’erreur avec un code stable
+et les références disponibles, sans valeur de cellule.
 
 La génération des rapports HTML et CSV n’est pas encore
 implémentée.
