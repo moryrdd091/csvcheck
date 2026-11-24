@@ -157,9 +157,14 @@ Pour `MISSING_COLUMN`, les quatre références sont vides. Le rapport HTML ident
 
 Chaque analyse utilise un nouveau dossier de rapports. Aucun fichier existant ne doit être écrasé, et le fichier source ne doit jamais servir de destination.
 
-Les rapports ne deviennent définitifs qu’après la lecture complète et la réussite de leur génération. Les temporaires éventuels sont placés dans l’emplacement de sortie choisi et nettoyés après utilisation ou échec, dans la mesure du possible.
+Les deux rapports sont écrits dans un dossier temporaire situé
+dans le répertoire de sortie. Le dossier n’apparaît sous son nom
+définitif qu’après l’écriture réussie des deux fichiers.
 
-Un échec de nettoyage est signalé sans valeur de cellule source. Il ne doit pas transformer une analyse incomplète en succès.
+En cas d’échec, le programme tente de supprimer le dossier temporaire
+et signale l’erreur d’origine. Si le nettoyage échoue lui aussi,
+un dossier temporaire peut subsister. Cet échec de nettoyage n’est
+pas signalé séparément et l’analyse n’est pas présentée comme un succès.
 
 ## Préservation des données et confidentialité
 

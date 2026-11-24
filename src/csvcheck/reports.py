@@ -6,6 +6,8 @@ from pathlib import Path
 
 from csvcheck.validation import ValidationResult
 
+from itertools import count
+
 ANOMALIES_CSV_HEADER = "record_number;line_start;line_end;column_index;rule"
 
 
@@ -117,14 +119,26 @@ def build_html_report(
     return "\n".join(parts)
 
 
-def _new_report_directory(output_base: Path, clock: Callable[[], datetime]) -> Path:
+def _reserve_report_directory(
+    output_base: Path,
+    clock: Callable[[], datetime],
+) -> tuple[Path, Path]:
     timestamp = clock().strftime("%Y%m%d-%H%M%S")
-    candidate = output_base / timestamp
-    suffix = 1
-    while candidate.exists():
-        candidate = output_base / f"{timestamp}-{suffix}"
-        suffix += 1
-    return candidate
+
+    for suffix in count():
+        name = timestamp if suffix == 0 else f"{timestamp}-{suffix}"
+        directory = output_base / name
+        staging = output_base / f".{name}.tmp"
+
+        try:
+            staging.mkdir(mode=0o700)
+        except FileExistsError:
+            continue
+
+        if not directory.exists(follow_symlinks=False):
+            return staging, directory
+
+        staging.rmdir()
 
 
 def write_reports(
@@ -135,18 +149,17 @@ def write_reports(
     separator: str,
     clock: Callable[[], datetime] = datetime.now,
 ) -> Path:
-    """Publier les rapports dans un dossier neuf et renvoyer son chemin."""
+    """Écrire les deux rapports avant de publier leur dossier."""
     output_base.mkdir(parents=True, exist_ok=True)
-    directory = _new_report_directory(output_base, clock)
-    directory.mkdir()
+    staging, directory = _reserve_report_directory(output_base, clock)
 
     try:
-        (directory / "anomalies.csv").write_text(
+        (staging / "anomalies.csv").write_text(
             build_anomalies_csv(validation),
             encoding="utf-8",
             newline="\n",
         )
-        (directory / "rapport.html").write_text(
+        (staging / "rapport.html").write_text(
             build_html_report(
                 validation,
                 source_name=source_name,
@@ -155,8 +168,13 @@ def write_reports(
             encoding="utf-8",
             newline="\n",
         )
+
+        if directory.exists(follow_symlinks=False):
+            raise FileExistsError("La destination des rapports existe déjà.")
+
+        staging.rename(directory)
     except BaseException:
-        shutil.rmtree(directory, ignore_errors=True)
+        shutil.rmtree(staging, ignore_errors=True)
         raise
 
     return directory

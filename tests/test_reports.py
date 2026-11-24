@@ -291,3 +291,37 @@ def test_write_reports_never_alters_source_file(tmp_path):
     )
 
     assert source.read_bytes() == original_bytes
+
+
+def test_write_reports_publishes_only_after_both_files_are_written(
+    tmp_path, monkeypatch
+):
+    source = TESTS_DIR / "fixtures" / "contacts_anomalies.csv"
+    validation = validate_contacts(read_csv(source))
+    output_base = tmp_path / "rapports"
+    final_directory = output_base / "20261123-143005"
+
+    original_write_text = Path.write_text
+
+    def write_before_publication(path, *args, **kwargs):
+        written = original_write_text(path, *args, **kwargs)
+        assert not final_directory.exists(), (
+            f"Le dossier définitif est déjà visible après l’écriture de {path.name}."
+        )
+        return written
+
+    monkeypatch.setattr(Path, "write_text", write_before_publication)
+
+    directory = write_reports(
+        validation,
+        output_base,
+        source_name=source.name,
+        separator=";",
+        clock=lambda: datetime(2026, 11, 23, 14, 30, 5),
+    )
+
+    assert directory == final_directory
+    assert {path.name for path in directory.iterdir()} == {
+        "anomalies.csv",
+        "rapport.html",
+    }
