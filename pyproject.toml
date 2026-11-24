@@ -4,7 +4,7 @@ build-backend = "hatchling.build"
 
 [project]
 name = "csvcheck"
-version = "0.1.0.dev0"
+version = "0.1.0"
 description = "Contrôle local de fichiers CSV de contacts."
 readme = "README.md"
 requires-python = ">=3.14,<3.15"
