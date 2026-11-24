@@ -1,6 +1,6 @@
 # Comportement attendu de csvcheck
 
-Ce document décrit les entrées acceptées, les contrôles, les sorties et les comportements en cas d’échec prévus pour la version 0.1. Il sert de référence pour l’implémentation et les tests ; il ne décrit pas des fonctionnalités déjà disponibles.
+Ce document décrit les entrées acceptées, les contrôles, les sorties et les comportements en cas d’échec de la version 0.1. Il sert de référence pour l’implémentation et les tests ; les fonctionnalités qu’il décrit sont implémentées et couvertes par la suite de tests.
 
 ## Objectif et périmètre
 

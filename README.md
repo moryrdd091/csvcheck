@@ -1,7 +1,7 @@
 # csvcheck
 
-Outil Python en cours de développement pour contrôler localement
-des fichiers CSV de contacts avant leur import dans un autre outil.
+Outil Python local pour contrôler des fichiers CSV de contacts
+avant leur import dans un autre outil.
 
 ## Objectif
 
@@ -50,6 +50,8 @@ recopiée. Une erreur bloquante ou un échec de génération
 ne publie aucun rapport.
 
 ## Utilisation
+
+Prérequis : Python 3.14.
 
 ```bash
 python -m pip install -e .
@@ -119,6 +121,10 @@ il ne vérifie pas l’existence des boîtes ou la délivrabilité.
 
 Un diagnostic conforme au profil ne garantit pas l’acceptation
 du fichier par tous les outils d’import.
+
+Un échec du nettoyage après une génération interrompue n’est
+pas signalé séparément : seule l’erreur de génération d’origine
+est rapportée.
 
 ## Licence
 
