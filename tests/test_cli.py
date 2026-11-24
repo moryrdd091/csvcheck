@@ -5,6 +5,7 @@ from pathlib import Path
 
 import pytest
 
+from csvcheck import cli as cli_module
 from csvcheck.cli import main
 
 
@@ -24,11 +25,12 @@ TESTS_DIR = Path(__file__).resolve().parent
     ],
 )
 def test_cli_exit_codes_and_summary_for_completed_analyses(
-    capsys, fixture_name, expected_exit_code, expected_status
+    tmp_path, capsys, fixture_name, expected_exit_code, expected_status
 ):
     source = str(TESTS_DIR / "fixtures" / f"{fixture_name}.csv")
+    output_base = tmp_path / "rapports"
 
-    exit_code = main([source])
+    exit_code = main(["--output", str(output_base), source])
     captured = capsys.readouterr()
 
     assert exit_code == expected_exit_code
@@ -87,7 +89,7 @@ def test_cli_accepts_comma_separator(tmp_path, capsys):
         encoding="utf-8",
     )
 
-    exit_code = main(["--separator", ",", str(source)])
+    exit_code = main(["--separator", ",", "--output", str(tmp_path / "rapports"), str(source)])
     captured = capsys.readouterr()
 
     assert exit_code == 0
@@ -102,3 +104,70 @@ def test_cli_rejects_unknown_separator(tmp_path):
         main(["--separator", "|", str(source)])
 
     assert exit_info.value.code == 2
+
+
+def test_cli_writes_reports_on_completed_analysis(tmp_path, capsys):
+    source = TESTS_DIR / "fixtures" / "contacts_anomalies.csv"
+    output_base = tmp_path / "rapports"
+
+    exit_code = main(["--output", str(output_base), str(source)])
+    captured = capsys.readouterr()
+
+    assert exit_code == 1
+    directories = list(output_base.iterdir())
+    assert len(directories) == 1
+    assert (directories[0] / "rapport.html").is_file()
+    assert (directories[0] / "anomalies.csv").is_file()
+    assert str(directories[0]) in captured.out
+
+
+def test_cli_creates_no_report_directory_on_blocking_error(tmp_path):
+    source = TESTS_DIR / "fixtures" / "csv_malforme.csv"
+    output_base = tmp_path / "rapports"
+
+    exit_code = main(["--output", str(output_base), str(source)])
+
+    assert exit_code == 2
+    assert not output_base.exists()
+
+
+def test_cli_reports_generation_failure(tmp_path, capsys, monkeypatch):
+    source = TESTS_DIR / "fixtures" / "contacts_propres.csv"
+    output_base = tmp_path / "rapports"
+
+    def failing_writer(*_args, **_kwargs):
+        raise OSError("disque plein")
+
+    monkeypatch.setattr(cli_module, "write_reports", failing_writer)
+
+    exit_code = main(["--output", str(output_base), str(source)])
+    captured = capsys.readouterr()
+
+    assert exit_code == 2
+    assert "Impossible de générer les rapports" in captured.err
+    assert "Traceback" not in captured.err
+    assert captured.out == ""
+
+
+def test_cli_module_end_to_end_writes_reports(tmp_path):
+    source = TESTS_DIR / "fixtures" / "contacts_anomalies.csv"
+    output_base = tmp_path / "rapports"
+
+    completed = subprocess.run(
+        [
+            sys.executable,
+            "-m",
+            "csvcheck.cli",
+            "--output",
+            str(output_base),
+            str(source),
+        ],
+        capture_output=True,
+        text=True,
+    )
+
+    assert completed.returncode == 1
+    directories = list(output_base.iterdir())
+    assert len(directories) == 1
+    assert (directories[0] / "rapport.html").is_file()
+    assert (directories[0] / "anomalies.csv").is_file()

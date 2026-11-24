@@ -43,8 +43,11 @@ standard et retourne le code 0, 1 ou 2. Les erreurs bloquantes
 sont affichées sur la sortie d’erreur avec un code stable
 et les références disponibles, sans valeur de cellule.
 
-La génération des rapports HTML et CSV n’est pas encore
-implémentée.
+Chaque analyse terminée publie un rapport HTML et un CSV
+d’anomalies dans un nouveau dossier horodaté. Aucun fichier
+existant n’est écrasé et aucune valeur de cellule n’est
+recopiée. Une erreur bloquante ou un échec de génération
+ne publie aucun rapport.
 
 ## Utilisation
 
@@ -57,13 +60,17 @@ csvcheck --separator , contacts_virgules.csv
 Codes de retour : 0 sans anomalie, 1 avec anomalies
 de données ou de schéma, 2 analyse impossible.
 
+Chaque analyse terminée crée un dossier de rapports horodaté,
+contenant le rapport HTML et le CSV d’anomalies, dans le
+répertoire de sortie (« rapports » par défaut, option --output).
+
 Le séparateur est le point-virgule par défaut ; la virgule
 est disponible sur choix explicite. Aucune détection
 automatique n’est effectuée.
 
 ## Périmètre de la version 0.1
 
-Fonctionnalités prévues :
+Fonctionnalités implémentées :
 
 - Lecture de CSV UTF-8 avec séparateur explicite.
 - Vérification des colonnes et des valeurs obligatoires.
@@ -99,9 +106,8 @@ du lecteur, de la validation métier et de la couche applicative.
 Les anomalies, les statuts de validation et les compteurs
 sont comparés aux résultats attendus.
 
-Les codes de retour sont vérifiés pour les quatre jeux
-de référence. Les rapports ne sont pas encore vérifiés
-par cette suite.
+Les codes de retour, le contenu des rapports et leur
+publication sont vérifiés par cette suite.
 
 ## Limites du périmètre
 

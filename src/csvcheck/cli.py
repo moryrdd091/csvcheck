@@ -1,5 +1,7 @@
 import argparse
 import sys
+
+from csvcheck.reports import write_reports
 from pathlib import Path
 
 from csvcheck.application import (
@@ -36,6 +38,11 @@ def main(argv: list[str] | None = None) -> int:
         default=";",
         help="Séparateur de champs du fichier CSV",
     )
+    parser.add_argument(
+        "--output",
+        default="rapports",
+        help="Répertoire de base des rapports générés",
+    )
     args = parser.parse_args(argv)
 
     path = Path(args.fichier)
@@ -57,9 +64,23 @@ def main(argv: list[str] | None = None) -> int:
         return 2
 
     assert isinstance(outcome, AnalysisCompleted)
-    _print_summary(outcome.validation)
+    validation = outcome.validation
 
-    if outcome.validation.status == "clean":
+    try:
+        directory = write_reports(
+            validation,
+            Path(args.output),
+            source_name=args.fichier,
+            separator=args.separator,
+        )
+    except OSError as error:
+        print(f"Impossible de générer les rapports : {error}", file=sys.stderr)
+        return 2
+
+    _print_summary(validation)
+    print(f"Rapports : {directory}")
+
+    if validation.status == "clean":
         return 0
     return 1
 

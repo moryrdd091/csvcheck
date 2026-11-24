@@ -14,5 +14,5 @@ __pycache__/
 .mypy_cache/
 
 # Rapports générés et données de travail locales
-/reports/
+/rapports/
 /data/
