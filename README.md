@@ -128,4 +128,4 @@ est rapportée.
 
 ## Licence
 
-Aucune licence de réutilisation n’est définie à ce stade.
+Ce projet est distribué sous licence [MIT](LICENSE).
